@@ -1,0 +1,29 @@
+<html>
+<head>
+	<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+	<meta name="description" content="WebRTC Video Broadcast.">
+	<meta name="author" content="Brian Mau">
+	<link href="/css/main.css" rel="stylesheet">
+</head>
+<body>
+<div class="left">
+  <h2>Stream</h2>
+  <video id="streaming" width="360" height="360" autoplay muted></video><br /><br />
+  <div id="streamButton" class="button">
+    Stream
+  </div>
+</div>
+<div class="bottom">
+  <h2>Chat</h2>
+  <div id="chat" width="240"></div>
+  <input id="newMessage" type="text" />
+  <div class="button" id="postMessageButton">
+    Send
+  </div>
+</div>
+<script src="/socket.io/socket.io.js"></script>
+<script src="/js/index_config.js"></script>
+<script src="/js/watch.js"></script>
+<script src="/js/chat.js"></script>
+</body>
+</html>

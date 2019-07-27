@@ -1,0 +1,54 @@
+<html>
+<head>
+<link href="/css/main.css" rel="stylesheet">
+</head>
+<body>
+<p>Click the "Start" button to begin video recording for a few seconds. You can stop
+   the video by clicking the creatively-named "Stop" button. The "Download"
+   button will download the received data (although it's in a raw, unwrapped form
+   that isn't very useful).
+</p>
+<br>
+<div class="left">
+  <h2>Preview</h2>
+  <video class="clear" id="preview" width="360" height="360" autoplay muted></video><br /><br />
+  <div class="publish_button" id="startButton">
+    Start
+  </div>
+  <div class="publish_button" id="stopButton">
+    Stop
+  </div>
+</div>
+<div class="left">
+  <h2>Stream</h2>
+  <video id="stream" width="360" height="360" autoplay muted></video><br /><br />
+  <div id="streamButton" class="button">
+    Stream
+  </div>
+</div>
+<div class="left">
+  <h2>Recording</h2>
+  <video id="recording" width="360" height="360" controls></video><br /><br />
+  <a id="downloadButton" class="button">
+    Download
+  </a>
+</div>
+<div class="left">
+  <h2>Chat</h2>
+  <div id="chat" width="240"></div>
+  <input id="newMessage" type="text" />
+  <div class="button" id="postMessageButton">
+    Send
+  </div>
+</div>
+<div class="bottom">
+  <pre id="log"></pre>
+</div>
+<script src="/socket.io/socket.io.js"></script>
+<script src="/js/md5.js"></script>
+<script src="/js/index_config.js"></script>
+<script src="/js/index.js"></script>
+<script src="/js/broadcast.js"></script>
+<script src="/js/chat.js"></script>
+</body>
+</html>

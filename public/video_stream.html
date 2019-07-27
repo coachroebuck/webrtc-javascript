@@ -1,0 +1,47 @@
+<html>
+<head>
+<link href="/css/group_chat.css" rel="stylesheet">
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script> 
+</head>
+<body>
+<div class="my_section">
+  <div class="my_video_group">
+    <video id="broadcast_video" class="my_video" width="360" height="360" autoplay muted poster="/img/video_placeholder.png"></video>
+  </div>
+  <div class="my_chat_group">
+    <div class="all_messages_group">
+      <ul id="messages"></ul>
+    </div>
+    <div class="new_message_group">
+      <form action="">
+        <input id="newMessageTextField" autocomplete="off" /><button id="postMessageButton">Send</button>
+      </form>
+    </div>
+  </div>
+</div>
+<div class="their_section">
+  <ul id="their_videos" class="their_videos">
+      <li class="their_info">
+        <b id="my_video_name" class="their_name">Me</b><br />
+        <video id="my_video" class="their_video" poster="/img/video_not_available.png" autoplay muted></video>
+      </li>
+      <!-- <li class="their_info">
+        <b id="their_name_00002" class="their_name">Mary</b><br />
+        <video id="theirVideo_00002" class="their_video" poster="/img/video_placeholder.png" autoplay muted></video>
+      </li>
+      <li class="their_info">
+        <b id="their_name_00003" class="their_name">Mary</b><br />
+        <video id="theirVideo_00003" class="their_video" poster="/img/video_not_available.png" autoplay muted></video>
+      </li> -->
+    </ul> 
+</div>
+<div class="bottom">
+  <pre id="log"></pre>
+</div>
+<script src="/socket.io/socket.io.js"></script>
+<script src="/js/md5.js"></script>
+<script src="/js/VideoStreamer.js"></script>
+<script src="/js/VideoBroadcaster.js"></script>
+<script src="/js/video_stream.js"></script>
+</body>
+</html>
