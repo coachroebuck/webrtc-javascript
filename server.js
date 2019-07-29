@@ -3,6 +3,7 @@ const express = require('express');
 const app = express();
 let broadcaster;
 let broadcasters = {};
+let viewers = {};
 let server;
 let port;
 let socketIdMap = {};
@@ -41,35 +42,50 @@ function startServer(server, port) {
 function onSocketConnected(io, socket) {
   let payload = socket.handshake.query.payload;
 
-  console.log("payload=" + payload);
   let json = JSON.parse(payload);
   let userName = json["userName"];
   let title = json["title"];
   
   socketIdMap[socket.id] = userName;
   
-  console.log("socketId=[" + socket.id + "] userName=[" + userName + "] title=[" + title + "]");
-
   socket.on('broadcaster', function () {
-    console.log("socketId=[" + socket.id + "] userName=[" + userName + "] BROADCASTING...");
+    
+    
     broadcaster = socket.id;
-    broadcasters[socket.id] = {
-      "userName" : userName,
-      "title" : title,
-      "viewers": {}
-    };
     socket.broadcast.emit('broadcaster');
-    console.log("broadcasters: " + Object.keys(broadcasters));
+    
+    let newDetails = {};
+    newDetails["userName"] = userName;
+    newDetails["title"] = title;
+    newDetails["viewers"] = [];
+    
+    broadcasters[socket.id] = newDetails;
+    viewers[socket.id] = {};
+
+    console.log("newDetails=[" + JSON.stringify(newDetails) + "] BROADCASTING...");
+    
   });
-  socket.on('message', function (message) {
+  socket.on('message', function (id, message) {
     console.log("new message: ", message);
     io.emit("message", message);
   });
+  socket.on('available', function () {
+    console.log("socketId=[" + socket.id + "] REQUESTING LIVE STREAMS...");
+    io.emit("available", JSON.stringify(broadcasters));
+    // socket.to(socket.id).emit('available', JSON.stringify(broadcasters));
+    // socket.to(socket.id).emit('available', JSON.stringify(broadcasters));
+  });
+  socket.on('view', function (socketId) {
+    // console.log("socketId=[" + socket.id + "] REQUESTING LIVE STREAMS...");
+    // io.emit('available', JSON.stringify(broadcasters));
+    // socket.to(socket.id).emit('available', JSON.stringify(broadcasters));
+  });
   socket.on('watcher', function (socketId) {
     if(broadcaster != null) {
-      socket.to(broadcaster).emit('watcher', socket.id);
-      socket.to(broadcaster).emit('viewer', userName);
-      console.log("socketId=[" + socket.id + "] userName=[" + userName + "] VIEWING BROADCAST [" + broadcaster + "]");
+      console.log("socketId=[" + socket.id + "] parentWocketId=[" + socketId + "] WATCHING...");
+      socket.to(socketId).emit('watcher', socket.id);
+      socket.to(socketId).emit('viewer', userName);
+      console.log("socketId=[" + socket.id + "] userName=[" + userName + "] VIEWING BROADCAST [" + socketId + "]");
     }
   });
   socket.on('offer', function (id /* of the watcher */, message) {
@@ -87,5 +103,6 @@ function onSocketConnected(io, socket) {
     broadcaster && socket.to(broadcaster).emit('bye', userDisconnected);
     delete socketIdMap[socket.id];
     delete broadcasters[socket.id];
+    delete viewers[socket.id]
   });
 }
