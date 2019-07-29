@@ -77,7 +77,12 @@ var VideoBroadcaster = (function(myVideoView) { // immediate function
 
     function startVideoBroadcast() {
     	try {
-    		socket = io.connect("http://192.168.29.137:3001?userName=" + userName);	//window.location.origin
+    		var json = {};
+			json["userName"] = userName;
+			json["title"] = timestamp;
+			let payload = JSON.stringify(json);
+			
+    		socket = io.connect(window.location.origin + "?payload=" + payload);
 			socket.emit('broadcaster');
 		    onMessageReceived("Started broadcast");
 

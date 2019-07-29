@@ -1,4 +1,12 @@
-const userName = "mroebuck"
+let now = new Date();
+let timestamp = "recording-"
+      + now.getFullYear() + "-"
+      + (now.getMonth() + 1).toString().padStart(2, '0') + "-"
+      + now.getDay().toString().padStart(2, '0') + "--"
+      + now.getHours().toString().padStart(2, '0') + "-"
+      + now.getMinutes().toString().padStart(2, '0') + "-"
+      + now.getSeconds().toString().padStart(2, '0');
+const userName = "jacob";
 const userColor = "#0041C2"
 const broadcastVideoView = document.getElementById("broadcast_video");
 const myVideoView = document.getElementById("my_video");

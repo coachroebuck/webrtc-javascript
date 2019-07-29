@@ -61,19 +61,29 @@ var VideoStreamer = (function(myVideoView) { // immediate function
     };
 
     function startVideoStream() {
-    	streamingSocket = io.connect("http://192.168.29.137:3001?userName=" + userName);	//window.location.origin
-    	streamingSocket.on('offer', function(id, description) {
+    	    var json = {};
+			json["userName"] = userName;
+			json["title"] = timestamp;
+			let payload = JSON.stringify(json);
+			
+    		streamingSocket = io.connect(window.location.origin + "?payload=" + payload);
+			streamingSocket.on('offer', function(id, description) {
 			peerConnection = new RTCPeerConnection(config);
 			peerConnection.setRemoteDescription(description)
 			.then(() => peerConnection.createAnswer())
 			.then(sdp => peerConnection.setLocalDescription(sdp))
 			.then(function () {
+				onMessageReceived("peer answered...");
 				streamingSocket.emit('answer', id, peerConnection.localDescription);
 			});
 			peerConnection.onaddstream = function(event) {
-				videoView.srcObject = event.stream;
+				onMessageReceived("Adding peer stream...");
+				if(videoView.srcObject == null) {
+					videoView.srcObject = event.stream;
+				}
 			};
 			peerConnection.onicecandidate = function(event) {
+				onMessageReceived("onIceCandiate()...");
 				if (event.candidate) {
 					streamingSocket.emit('candidate', id, event.candidate);
 				}
@@ -81,6 +91,7 @@ var VideoStreamer = (function(myVideoView) { // immediate function
 		});
 
 		streamingSocket.on('candidate', function(id, candidate) {
+			onMessageReceived("received candidate()...");
 			peerConnection.addIceCandidate(new RTCIceCandidate(candidate))
 		  .catch(e => console.error(e));
 		});
@@ -91,6 +102,10 @@ var VideoStreamer = (function(myVideoView) { // immediate function
 		});
 
 		streamingSocket.on('message', function(message) {
+			onPeerMessageReceived(message);
+		});
+
+		streamingSocket.on('live', function(message) {
 			onPeerMessageReceived(message);
 		});
 
