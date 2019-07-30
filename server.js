@@ -14,13 +14,25 @@ var credentials = {
   cert: fs.readFileSync('localhost.includesprivatekey.pem')
 };
 
+app.route("/statistics")
+.get(function (req, res) {
+  let json = {};
+  json["broadcasters"] = broadcasters;
+  json["viewers"] = viewers;
+
+  res.contentType('application/json');
+  res.status(200);
+  res.send(JSON.stringify(json) + "\n");
+  res.end();
+});
+
 //HTTPS
 if (credentials.key && credentials.cert) {
   const https = require('https');
   server = https.createServer(credentials, app);
   port = 443;
   startServer(server, port);
-} 
+}
 
 //HTTP
 const http = require('http');
@@ -45,25 +57,24 @@ function onSocketConnected(io, socket) {
   let json = JSON.parse(payload);
   let userName = json["userName"];
   let title = json["title"];
-  
+
   socketIdMap[socket.id] = userName;
-  
+
   socket.on('broadcaster', function () {
-    
-    
+
+
     broadcaster = socket.id;
     socket.broadcast.emit('broadcaster');
-    
+
     let newDetails = {};
     newDetails["userName"] = userName;
     newDetails["title"] = title;
-    newDetails["viewers"] = [];
-    
+
     broadcasters[socket.id] = newDetails;
-    viewers[socket.id] = {};
+    viewers[socket.id] = [];
 
     console.log("newDetails=[" + JSON.stringify(newDetails) + "] BROADCASTING...");
-    
+
   });
   socket.on('message', function (id, message) {
     console.log("new message: ", message);
@@ -81,12 +92,13 @@ function onSocketConnected(io, socket) {
     // socket.to(socket.id).emit('available', JSON.stringify(broadcasters));
   });
   socket.on('watcher', function (socketId) {
-    if(broadcaster != null) {
-      console.log("socketId=[" + socket.id + "] parentWocketId=[" + socketId + "] WATCHING...");
-      socket.to(socketId).emit('watcher', socket.id);
-      socket.to(socketId).emit('viewer', userName);
-      console.log("socketId=[" + socket.id + "] userName=[" + userName + "] VIEWING BROADCAST [" + socketId + "]");
-    }
+    socket.to(socketId).emit('watcher', socket.id);
+    socket.to(socketId).emit('viewer', userName);
+    console.log("socketId=[" + socket.id + "] userName=[" + userName + "] VIEWING BROADCAST [" + socketId + "]");
+
+    let array = viewers[socketId];
+    array.push(socket.id);
+    viewers[socketId] = array;
   });
   socket.on('offer', function (id /* of the watcher */, message) {
     socket.to(id).emit('offer', socket.id /* of the broadcaster */, message);
@@ -103,6 +115,10 @@ function onSocketConnected(io, socket) {
     broadcaster && socket.to(broadcaster).emit('bye', userDisconnected);
     delete socketIdMap[socket.id];
     delete broadcasters[socket.id];
-    delete viewers[socket.id]
+
+    for(allViewers in viewers[socket.id]) {
+        delete allViewers[socket.id];
+    }
+    delete viewers[socket.id];
   });
 }

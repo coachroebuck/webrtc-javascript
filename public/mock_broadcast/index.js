@@ -10,6 +10,8 @@ const userColor = "#0041C2"
 const startButton = document.getElementById("startButton");
 const stopButton = document.getElementById("stopButton");
 const userName = document.getElementById("userName");
+const infoDiv = document.getElementById("info");
+
 var socket = null;
 var activeStream = null;
 var peerConnections = {};
@@ -28,15 +30,16 @@ function connect(userName, timestamp) {
 		json["userName"] = userName;
 		json["title"] = timestamp;
 		let payload = JSON.stringify(json);
-		
+
 		socket = io.connect(window.location.origin + "?payload=" + payload);
 		socket.emit('broadcaster');
-	
+
 	    socket.on('answer', function(id, description) {
 	    	peerConnections[id].setRemoteDescription(description);
 		});
 
 		socket.on('watcher', function(id) {
+      infoDiv.innerHTML = "new viewer: " + id;
 			const peerConnection = new RTCPeerConnection(config);
 			peerConnections[id] = peerConnection;
 			peerConnection.addStream(videoView.srcObject);

@@ -13,6 +13,7 @@ const browseButton = document.getElementById("browseButton");
 const userName = document.getElementById("userName");
 const socketIdSelection = document.getElementById("socketId");
 const watchButton = document.getElementById("watchButton");
+const infoDiv = document.getElementById("info");
 
 var socket = null;
 var activeStream = null;
@@ -40,14 +41,14 @@ function connect(userName, timestamp) {
 		json["userName"] = userName;
 		json["title"] = timestamp;
 		let payload = JSON.stringify(json);
-		
+
 		socket = io.connect(window.location.origin + "?payload=" + payload);
 		socket.emit('available');
-	
+
 	    socket.on('available', function(message) {
-	    	alert(message);
+	    	infoDiv.innerHTML = message;
 		});
-	
+
 	    socket.on('answer', function(id, description) {
 	    	peerConnections[id].setRemoteDescription(description);
 		});
@@ -76,7 +77,8 @@ function connect(userName, timestamp) {
 		});
 
 		socket.on('message', function(message) {
-		});
+      infoDiv.innerHTML = message;
+    });
 
 		socket.on('broadcaster', function() {
 		});
@@ -97,7 +99,6 @@ function browse() {
 
 function watch(socketId) {
 	socket.emit('watcher', socketId);
-	alert("socket selected: " + socketIdSelection.value);
 }
 
 function disconnect() {
