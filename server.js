@@ -17,6 +17,7 @@ var credentials = {
 };
 
 app.route("/statistics").get([onStatistics]);
+app.route("/").get([onHome]);
 
 //HTTPS
 if (credentials.key && credentials.cert) {
@@ -120,5 +121,12 @@ function onStatistics(req, res) {
   res.contentType('application/json');
   res.status(200);
   res.send(JSON.stringify(json) + "\n");
+  res.end();
+}
+
+function onHome(req, res) {
+  res.contentType('application/json');
+  res.status(200);
+  res.send("Hi! This actually works!!");
   res.end();
 }
