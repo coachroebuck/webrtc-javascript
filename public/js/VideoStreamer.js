@@ -61,13 +61,13 @@ var VideoStreamer = (function(myVideoView) { // immediate function
     };
 
     function startVideoStream() {
-    	    var json = {};
-			json["userName"] = userName;
-			json["title"] = timestamp;
-			let payload = JSON.stringify(json);
-			
-    		streamingSocket = io.connect(window.location.origin + "?payload=" + payload);
-			streamingSocket.on('offer', function(id, description) {
+	    var json = {};
+		json["userName"] = userName;
+		json["title"] = timestamp;
+		let payload = JSON.stringify(json);
+		
+		streamingSocket = io.connect(window.location.origin + "?payload=" + payload);
+		streamingSocket.on('offer', function(id, description) {
 			peerConnection = new RTCPeerConnection(config);
 			peerConnection.setRemoteDescription(description)
 			.then(() => peerConnection.createAnswer())
