@@ -5,40 +5,31 @@ let broadcaster;
 let broadcasters = {};
 let viewers = {};
 let server;
-let port;
 let socketIdMap = {};
-let broa
+let port = process.env.PORT;
+if (port == null || port == "") {
+  port = 8000;
+}
 
 var credentials = {
   key: fs.readFileSync('localhost.includesprivatekey.pem'),
   cert: fs.readFileSync('localhost.includesprivatekey.pem')
 };
 
-app.route("/statistics")
-.get(function (req, res) {
-  let json = {};
-  json["broadcasters"] = broadcasters;
-  json["viewers"] = viewers;
-
-  res.contentType('application/json');
-  res.status(200);
-  res.send(JSON.stringify(json) + "\n");
-  res.end();
-});
+app.route("/statistics").get([onStatistics]);
 
 //HTTPS
 if (credentials.key && credentials.cert) {
   const https = require('https');
   server = https.createServer(credentials, app);
-  port = 443;
+  // port = 443;
   startServer(server, port);
 }
 
 //HTTP
-const http = require('http');
-server = http.createServer(app);
-port = 3001;
-startServer(server, port);
+// const http = require('http');
+// server = http.createServer(app);
+// startServer(server, port);
 
 function startServer(server, port) {
   const io = require('socket.io')(server);
@@ -83,8 +74,6 @@ function onSocketConnected(io, socket) {
   socket.on('available', function () {
     console.log("socketId=[" + socket.id + "] REQUESTING LIVE STREAMS...");
     io.emit("available", JSON.stringify(broadcasters));
-    // socket.to(socket.id).emit('available', JSON.stringify(broadcasters));
-    // socket.to(socket.id).emit('available', JSON.stringify(broadcasters));
   });
   socket.on('view', function (socketId) {
     // console.log("socketId=[" + socket.id + "] REQUESTING LIVE STREAMS...");
@@ -121,4 +110,15 @@ function onSocketConnected(io, socket) {
     }
     delete viewers[socket.id];
   });
+}
+
+function onStatistics(req, res) {
+  let json = {};
+  json["broadcasters"] = broadcasters;
+  json["viewers"] = viewers;
+
+  res.contentType('application/json');
+  res.status(200);
+  res.send(JSON.stringify(json) + "\n");
+  res.end();
 }
