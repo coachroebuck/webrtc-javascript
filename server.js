@@ -30,7 +30,7 @@ app.route("/statistics")
 if (credentials.key && credentials.cert) {
   const https = require('https');
   server = https.createServer(credentials, app);
-  port = 443;
+  port = process.env.PORT || 443;
   startServer(server, port);
 }
 
