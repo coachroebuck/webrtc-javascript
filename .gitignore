@@ -1,4 +1,10 @@
-.DS_Store
+# Node build artifacts
 node_modules
+
+# Local development
+*.env
+*.dev
+.DS_Store
+
 .vscode
 package-lock.json
